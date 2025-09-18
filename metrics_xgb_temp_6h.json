@@ -1,0 +1,21 @@
+{
+  "model_name": "xgb_temp_6h_v1",
+  "horizon_h": 6,
+  "n_samples_total": 509,
+  "n_train": 408,
+  "n_test": 101,
+  "features": [
+    "temp_c",
+    "humidity_pct",
+    "pressure_hpa",
+    "wind_speed_ms",
+    "clouds_pct",
+    "hour_sin",
+    "hour_cos",
+    "dow_sin",
+    "dow_cos"
+  ],
+  "cv_mae_mean": 1.1500876637627093,
+  "cv_mae_std": 0.317367440826429,
+  "test_mae": 1.2546061438381084
+}

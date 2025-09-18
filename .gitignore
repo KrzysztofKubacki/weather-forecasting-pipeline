@@ -1,0 +1,35 @@
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environments
+.env
+.venv/
+env/
+venv/
+
+# Jupyter notebook checkpoints
+.ipynb_checkpoints
+
+# IDE / Editor settings
+.vscode/
+.idea/
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Model artifacts
+*.joblib
+*.pkl
+
+# Data exports
+powerbi/exports/
+
+# Local environment config
+.env
