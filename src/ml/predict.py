@@ -10,23 +10,16 @@ from sqlalchemy import create_engine, text
 load_dotenv()
 engine = create_engine(os.getenv("DB_URL"), future=True)
 
-# ile ostatnich rekordów na miasto pobieramy do predykcji
 LAST_PER_CITY = 12
 
-# cechy jak w train_model.py
 FEATURES = [
     "temp_c", "humidity_pct", "pressure_hpa", "wind_speed_ms", "clouds_pct",
     "hour_sin", "hour_cos", "dow_sin", "dow_cos"
 ]
 
-# horyzonty, dla których robimy prognozy
 HORIZONS_H = [3, 6]
 
 def fetch_recent_features(last_per_city: int = LAST_PER_CITY) -> pd.DataFrame:
-    """
-    Pobiera ostatnie N rekordów z weather_current na każde miasto
-    i wylicza cechy czasowe zgodne z treningiem.
-    """
     sql = f"""
     WITH ranked AS (
       SELECT
@@ -101,19 +94,19 @@ def run():
         model_name = f"xgb_temp_{H}h_v1"
 
         if not os.path.exists(model_path):
-            print(f"⚠️  Brak modelu dla +{H}h ({model_path}). Ten horyzont zostaje pominięty.")
+            print(f"Brak modelu dla +{H}h ({model_path}). Ten horyzont zostaje pominięty.")
             continue
 
         model = joblib.load(model_path)
         preds = model.predict(X)
         upsert_predictions(feats, preds, H, model_name)
-        print(f"✅ Zapisano {len(preds)} predykcji dla horyzontu +{H}h.")
+        print(f"Zapisano {len(preds)} predykcji dla horyzontu +{H}h.")
         total_saved += len(preds)
 
     if total_saved == 0:
         print("Nie zapisano żadnych predykcji (brak dostępnych modeli).")
     else:
-        print(f"🔎 Razem zapisano: {total_saved} predykcji (horyzonty: {HORIZONS_H}).")
+        print(f"Razem zapisano: {total_saved} predykcji (horyzonty: {HORIZONS_H}).")
 
 if __name__ == "__main__":
     run()

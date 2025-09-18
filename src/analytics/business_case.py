@@ -16,10 +16,6 @@ HEAT_ALERT = 28.0   # potencjalnie większy ruch/zużycie energii
 COLD_ALERT = 0.0    # mróz -> ryzyka operacyjne
 
 def load_data() -> pd.DataFrame:
-    """
-    Łączy predykcje z 'weather_predictions' z rzeczywistą temperaturą z 'weather_current'
-    dopasowaną do chwili (ts_utc + horizon_h).
-    """
     sql = """
     WITH preds AS (
       SELECT city_id, ts_utc, horizon_h, pred_temp_c, model_name, created_at
@@ -46,24 +42,18 @@ def load_data() -> pd.DataFrame:
     return df
 
 def kpi(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    KPI jakości prognoz (MAE / MAPE), liczone tylko tam, gdzie mamy 'actual'.
-    """
     out = df.copy()
 
     # Bezpieczne rzutowanie na float
     out["pred_temp_c"] = pd.to_numeric(out["pred_temp_c"], errors="coerce")
     out["actual_temp_c"] = pd.to_numeric(out["actual_temp_c"], errors="coerce")
 
-    # Maska: mamy actual i ≠ NaN
     m_has_actual = out["actual_temp_c"].notna()
 
-    # Oblicz błąd bezpiecznie (tylko dla wierszy z actual)
     out["abs_err"] = np.nan
     out.loc[m_has_actual, "abs_err"] = (out.loc[m_has_actual, "actual_temp_c"]
                                         - out.loc[m_has_actual, "pred_temp_c"]).abs()
 
-    # MAPE tylko tam, gdzie actual ≠ 0
     m_nonzero = m_has_actual & (out["actual_temp_c"] != 0)
     out["ape"] = np.nan
     out.loc[m_nonzero, "ape"] = out.loc[m_nonzero, "abs_err"] / out.loc[m_nonzero, "actual_temp_c"].abs()
@@ -75,7 +65,6 @@ def kpi(df: pd.DataFrame) -> pd.DataFrame:
         mape=("ape", "mean"),
     )
 
-    # Żeby było czytelniej w BI (zaokrąglenia)
     agg["mae"] = agg["mae"].round(2)
     agg["mape"] = (agg["mape"] * 100).round(1)  # w %
     return agg
@@ -112,7 +101,7 @@ def run():
     al_df.to_csv(f"{OUT_DIR}/alerts_by_day.csv", index=False, encoding="utf-8")
     df.to_csv(f"{OUT_DIR}/pred_vs_actual_detailed.csv", index=False, encoding="utf-8")
 
-    print("✅ Zapisano:")
+    print("Zapisano:")
     print(" - powerbi/exports/kpi_forecast_accuracy.csv   (MAE/MAPE per miasto i horyzont; tylko tam, gdzie są 'actuals')")
     print(" - powerbi/exports/alerts_by_day.csv           (liczba godzin upału/mrozu dziennie per miasto/horyzont)")
     print(" - powerbi/exports/pred_vs_actual_detailed.csv (pełna tabela predykcji + ewentualne actuals)")

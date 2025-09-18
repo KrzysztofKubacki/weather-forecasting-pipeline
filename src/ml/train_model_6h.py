@@ -122,11 +122,11 @@ def train():
     with open(METRICS_PATH, "w", encoding="utf-8") as f:
         json.dump(metrics, f, ensure_ascii=False, indent=2)
 
-    print("✅ Wyniki:")
-    print(f"   CV MAE: {cv_mae_mean:.2f} ± {cv_mae_std:.2f} °C")
-    print(f"   TEST MAE: {mae_test:.2f} °C")
-    print(f"💾 Model zapisany → {MODEL_PATH}")
-    print(f"💾 Metryki zapisane → {METRICS_PATH}")
+    print("Wyniki:")
+    print(f"CV MAE: {cv_mae_mean:.2f} ± {cv_mae_std:.2f} °C")
+    print(f"TEST MAE: {mae_test:.2f} °C")
+    print(f"Model zapisany → {MODEL_PATH}")
+    print(f"Metryki zapisane → {METRICS_PATH}")
 
 
 if __name__ == "__main__":

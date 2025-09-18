@@ -61,8 +61,6 @@ def train():
     df_train, df_test = _chronological_split(df, test_size=0.2)
     X_train, y_train = df_train[FEATURES], df_train[TARGET]
     X_test, y_test = df_test[FEATURES], df_test[TARGET]
-
-    # TimeSeries CV
     tscv = TimeSeriesSplit(n_splits=5)
     cv_maes = []
     for fold, (tr_idx, val_idx) in enumerate(tscv.split(X_train), start=1):
@@ -89,7 +87,6 @@ def train():
     cv_mae_mean = float(np.mean(cv_maes))
     cv_mae_std = float(np.std(cv_maes))
 
-    # Finalny model
     model = XGBRegressor(
         n_estimators=500,
         learning_rate=0.03,
@@ -122,11 +119,11 @@ def train():
     with open(METRICS_PATH, "w", encoding="utf-8") as f:
         json.dump(metrics, f, ensure_ascii=False, indent=2)
 
-    print("✅ Wyniki:")
-    print(f"   CV MAE: {cv_mae_mean:.2f} ± {cv_mae_std:.2f} °C")
-    print(f"   TEST MAE: {mae_test:.2f} °C")
-    print(f"💾 Model zapisany → {MODEL_PATH}")
-    print(f"💾 Metryki zapisane → {METRICS_PATH}")
+    print("Wyniki:")
+    print(f"CV MAE: {cv_mae_mean:.2f} ± {cv_mae_std:.2f} °C")
+    print(f" TEST MAE: {mae_test:.2f} °C")
+    print(f"Model zapisany → {MODEL_PATH}")
+    print(f"Metryki zapisane → {METRICS_PATH}")
 
 
 if __name__ == "__main__":
