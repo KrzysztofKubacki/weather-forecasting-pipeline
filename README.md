@@ -1,58 +1,63 @@
 # Weather Forecasting Pipeline (ETL + SQL + ML + Analytics)
 
-## Opis projektu
-Projekt demonstruje kompletny pipeline **Data Engineering + Data Science** na darmowych danych pogodowych.  
-Celem jest przewidywanie temperatury w wybranych miastach na horyzoncie **+3h** i **+6h**, a następnie analiza biznesowa (alerty pogodowe, KPI jakości modelu).  
+---
 
-Projekt łączy:
-- **ETL** – pobieranie danych z API OpenWeather i zapis do bazy PostgreSQL,
-- **SQL** – model danych i obsługa predykcji,
-- **Python + ML** – trenowanie modeli XGBoost, generowanie prognoz,
-- **Analytics** – porównanie prognoz z rzeczywistością, eksport CSV do Power BI.
+## Project Description
+
+This project demonstrates a complete **Data Engineering + Data Science pipeline** using free weather data.  
+The goal is to forecast temperature in selected cities for a horizon of **+3h** and **+6h**, followed by business analysis (weather alerts, model quality KPIs).  
+
+The project combines:  
+- **ETL** – retrieving data from the OpenWeather API and storing it in a PostgreSQL database,  
+- **SQL** – data model and prediction handling,  
+- **Python + ML** – training XGBoost models, generating forecasts,  
+- **Analytics** – comparing forecasts with actuals, exporting CSVs to Power BI.  
 
 ---
 
-## Architektura
+## Architecture
 
-OpenWeather API → ETL (Python) → PostgreSQL
-↓
-Features (SQL + Pandas)
-↓
-ML (XGBoost +3h, +6h models)
-↓
-Predictions → weather_predictions
-↓
-Business analytics (KPI, Alerts) → CSV → Power BI
-
-
-## Stack technologiczny
-- **Python 3.10+**
-  - `pandas`, `numpy`, `sqlalchemy`, `python-dotenv`
-  - `xgboost`, `scikit-learn`, `joblib`
-- **PostgreSQL + pgAdmin**
-- **Power BI / Excel** (wizualizacje)
-- **Windows Task Scheduler** (automatyzacja ETL)
+OpenWeather API → ETL (Python) → PostgreSQL  
+↓  
+Features (SQL + Pandas)  
+↓  
+ML (XGBoost +3h, +6h models)  
+↓  
+Predictions → weather_predictions  
+↓  
+Business analytics (KPI, Alerts) → CSV → Power BI  
 
 ---
 
-## Struktura projektu
+## Tech Stack
+
+- **Python 3.10+**  
+  - `pandas`, `numpy`, `sqlalchemy`, `python-dotenv`  
+  - `xgboost`, `scikit-learn`, `joblib`  
+- **PostgreSQL + pgAdmin**  
+- **Power BI / Excel** (visualizations)  
+- **Windows Task Scheduler** (ETL automation)  
+
+---
+
+## Project Structure
 ```bash
 src/
 ├── etl/
-│   └── run_etl.py          # pobieranie danych z OpenWeather i zapis do DB
+│   └── run_etl.py          # fetches data from OpenWeather and stores it in DB
 ├── ml/
-│   ├── features.py         # budowa datasetu dla ML
-│   ├── train_model.py      # model +3h
-│   ├── train_model_6h.py   # model +6h
-│   └── predict.py          # zapis prognoz (+3h, +6h)
+│   ├── features.py         # builds dataset for ML
+│   ├── train_model.py      # +3h model
+│   ├── train_model_6h.py   # +6h model
+│   └── predict.py          # saves forecasts (+3h, +6h)
 └── analytics/
-    └── business_case.py    # KPI, alerty, eksport CSV
+    └── business_case.py    # KPIs, alerts, CSV export
+
 ```
 
 
-## Instrukcja uruchomienia
-
-### 1. Klon repozytorium i instalacja zależności
+## How to Run
+### 1. Clone repository and install dependencies
 ```bash
 conda create -n weather python=3.10
 conda activate weather
@@ -60,37 +65,37 @@ pip install -r requirements.txt
 
 ```
 
-### 2. Ustaw zmienne środowiskowe w .env
+### 2. Set environment variables in .env
 ```ini
-DB_URL=postgresql+psycopg2://postgres:haslo@localhost:5432/weather
+DB_URL=postgresql+psycopg2://postgres:password@localhost:5432/weather
 
-API_KEY=twoj_klucz_openweather
+API_KEY=your_api_key_openweather
 ```
 ---
 
-### 3. Pobierz dane do bazy
+### 3. Load data into the database
 ```bash
 python -m src.etl.run_etl
 ```
 --- 
 
-### 4. Wytrenuj modele
+### 4. Train models
 ```bash
 python -m src.ml.train_model       # model +3h
 python -m src.ml.train_model_6h    # model +6h
 ```
 ---
 
-### 5. Wygeneruj prognozy
+### 5. Generate forecasts
 ```bash
 python -m src.ml.predict
 ```
 ---
-### 6. Analiza biznesowa i eksport CSV
+### 6. Business analytics and CSV export
 ```bash
 python -m src.analytics.business_case
 ```
-Pliki CSV znajdziesz w:
+Output files in:
 
 ```bash
 powerbi/exports/
@@ -98,47 +103,41 @@ powerbi/exports/
  ├── alerts_by_day.csv
  └── pred_vs_actual_detailed.csv
  ```
- ### KPI modelu
-Plik kpi_forecast_accuracy.csv zawiera m.in.:
-
-liczba prognoz (n_pred),
-
-liczba prognoz z rzeczywistymi wartościami (n_with_actual),
-
-MAE (średni błąd absolutny),
-
-MAPE (średni błąd procentowy).
 
 ---
 
- ### Alerty biznesowe
-Plik alerts_by_day.csv – agregacja godzin upału/mrozu:
-
-heat_hours – ile godzin prognozowanych z temp ≥ 28°C,
-
-cold_hours – ile godzin prognozowanych z temp ≤ 0°C.
-
----
-
- ### Automatyzacja
-ETL skonfigurowano w Windows Task Scheduler co 10 minut.
-
-Predykcje i analizy można odpalać ręcznie lub dodać jako kolejne zadania.
-
-Dzięki temu pipeline działa jak w realnym środowisku produkcyjnym.
+ ### KPI Metrics
+- File kpi_forecast_accuracy.csv includes:
+- number of forecasts (n_pred),
+- forecasts with actual values (n_with_actual),
+- MAE (Mean Absolute Error),
+- MAPE (Mean Absolute Percentage Error).
 
 ---
 
- ### Wartość biznesowa
-Retail/E-commerce → planowanie obłożenia sklepów w dni upalne/zimne.
-
-Energetyka → szacunek zapotrzebowania na ogrzewanie/klimatyzację.
-
-Logistyka → wczesne ostrzeżenie o ryzyku mrozu / upałów.
-
-Projekt pokazuje pełny cykl Data Engineering + Data Science z elementami MLOps i Business Intelligence.
+ ### Business Alerts
+- File alerts_by_day.csv aggregates extreme conditions:
+- heat_hours – forecasted hours with temp ≥ 28°C,
+- cold_hours – forecasted hours with temp ≤ 0°C.
 
 ---
 
- Autor
-Projekt stworzony jako portfolio / CV project przez [Twoje Imię].
+### Automation
+ETL is scheduled in Windows Task Scheduler every 10 minutes.
+Predictions and analytics can be run manually or added as additional scheduled jobs.
+
+This makes the pipeline operate similarly to a real production environment.
+
+---
+
+ ### Business Value
+- Retail/E-commerce &rarr; plan store capacity on hot/cold days.
+- Energy sector &rarr; estimate heating/AC demand.
+- Logistics &rarr; early alerts on frost/heat risks.
+ 
+The project demonstrates a full Data Engineering + Data Science cycle with elements of MLOps and Business Intelligence.
+
+---
+
+ ### Author
+Project created as a portfolio / CV project by Krzysztof Kubacki
